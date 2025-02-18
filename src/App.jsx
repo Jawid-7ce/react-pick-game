@@ -1,5 +1,5 @@
 import { useState } from "react";
-import styled, { keyframes } from "styled-components";
+import styled, { css, keyframes } from "styled-components";
 
 // 🎲 Dice Shake Animation (When Rolling)
 const shake = keyframes`
@@ -17,6 +17,29 @@ const winnerGlow = keyframes`
   100% { box-shadow: 0 0 10px gold; }
 `;
 
+const glow = keyframes`
+0% { text-shadow: 0 0 5px black; }
+50% { text-shadow: 0 0 15px black; }
+100% { text-shadow: 0 0 5px black; }
+`;
+
+const PlayerSection = styled.section`
+  flex: 1;
+  padding: 8rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: all 0.5s ease-in-out;
+  background: ${({ isActive }) => (isActive ? "rgba(255, 255, 255, 0.2)" : "none")};
+  animation: ${({ isActive }) => (isActive ? fadeIn : fadeOut)} 0.5s ease-in-out;
+
+  ${({ isWinner }) =>
+    isWinner &&
+    css`
+      animation: ${winnerGlow} 1.5s infinite alternate;
+      background: gold !important;
+    `}
+`;
 // 🔄 Fade In/Out Transition for Player Turn
 const fadeOut = keyframes`
   0% { opacity: 1; }
@@ -26,12 +49,6 @@ const fadeOut = keyframes`
 const fadeIn = keyframes`
   0% { opacity: 0.5; }
   100% { opacity: 1; }
-`;
-
-// 📥 Button Click Bounce
-const bounce = keyframes`
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
 `;
 
 const Main = styled.main`
@@ -55,20 +72,6 @@ const GameContainer = styled.div`
   overflow: hidden;
 `;
 
-const PlayerSection = styled.section`
-  flex: 1;
-  padding: 8rem;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  transition: all 0.5s ease-in-out;
-  background: ${(props) => (props.active ? "rgba(255, 255, 255, 0.2)" : "none")};
-  animation: ${(props) => (props.active ? fadeIn : fadeOut)} 0.5s ease-in-out;
-  ${(props) => props.winner && `
-    animation: ${winnerGlow} 1.5s infinite alternate;
-    background: gold !important;
-  `}
-`;
 
 const PlayerName = styled.h2`
   font-size: 4rem;
@@ -152,6 +155,7 @@ const WinnerMessage = styled.p`
   font-size: 3rem;
   font-weight: bold;
   color: #f4d03f;
+  animation: ${glow} 1.5s infinite alternate ease-in-out;
 `;
 
 function App() {
@@ -214,11 +218,11 @@ function App() {
 
   return (
     <Main>
-      <GameContainer>
-        {/* Player 1 */}
-        <PlayerSection active={activePlayer === 0} winner={scores[0] >= 100}>
-  <PlayerName active={activePlayer === 0}>Player 1</PlayerName>
-  <PlayerScore active={activePlayer === 0}>{scores[0]}</PlayerScore>
+  <GameContainer>
+    {/* Player 1 */}
+    <PlayerSection isActive={activePlayer === 0} isWinner={scores[0] >= 100}>
+  <PlayerName isActive={activePlayer === 0}>Player 1</PlayerName>
+  <PlayerScore isActive={activePlayer === 0}>{scores[0]}</PlayerScore>
   <CurrentBox>
     <CurrentLabel>Current</CurrentLabel>
     <CurrentScore>{activePlayer === 0 ? currentScore : 0}</CurrentScore>
@@ -226,9 +230,9 @@ function App() {
 </PlayerSection>
 
 {/* Player 2 */}
-<PlayerSection active={activePlayer === 1} winner={scores[1] >= 100}>
-  <PlayerName active={activePlayer === 1}>Player 2</PlayerName>
-  <PlayerScore active={activePlayer === 1}>{scores[1]}</PlayerScore>
+<PlayerSection isActive={activePlayer === 1} isWinner={scores[1] >= 100}>
+  <PlayerName isActive={activePlayer === 1}>Player 2</PlayerName>
+  <PlayerScore isActive={activePlayer === 1}>{scores[1]}</PlayerScore>
   <CurrentBox>
     <CurrentLabel>Current</CurrentLabel>
     <CurrentScore>{activePlayer === 1 ? currentScore : 0}</CurrentScore>
@@ -236,27 +240,32 @@ function App() {
 </PlayerSection>
 
 
-        {/* Dice Images */}
-        <DiceContainer>
+    {/* Dice */}
+    {(dice1 || dice2) && (
+      <DiceContainer>
         <Dice src={`/dice-${dice1}.png`} alt="Dice 1" shaking={shaking} />
         <Dice src={`/dice-${dice2}.png`} alt="Dice 2" shaking={shaking} />
-        </DiceContainer>
+      </DiceContainer>
+    )}
 
-        {/* Buttons */}
-        <Button style={{ top: "4rem" }} onClick={resetGame}>
-          🔄 New Game
-        </Button>
-        <Button style={{ top: "38rem" }} onClick={rollDice}>
-          🎲 Roll Dice
-        </Button>
-        <Button style={{ top: "45rem" }} onClick={holdScore}>
-          📥 Hold
-        </Button>
+    {/* Buttons */}
+    <Button style={{ top: "4rem" }} onClick={resetGame}>
+      🔄 New Game
+    </Button>
+    <Button style={{ top: "38rem" }} onClick={rollDice} disabled={scores[activePlayer] >= 100}>
+      🎲 Roll Dice
+    </Button>
+    <Button style={{ top: "45rem" }} onClick={holdScore} disabled={scores[activePlayer] >= 100}>
+      📥 Hold
+    </Button>
 
-        {/* Winner Message */}
-        {scores[activePlayer] >= 100 && <WinnerMessage>🎉 Player {activePlayer + 1} Wins!</WinnerMessage>}
-      </GameContainer>
-    </Main>
+    {/* Winner Message - Overlayed */}
+    {scores[activePlayer] >= 100 && (
+      <WinnerMessage>🎉 Player {activePlayer + 1} Wins!</WinnerMessage>
+    )}
+  </GameContainer>
+</Main>
+
   );
 }
 
