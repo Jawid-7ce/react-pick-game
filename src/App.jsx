@@ -1,5 +1,38 @@
 import { useState } from "react";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
+
+// 🎲 Dice Shake Animation (When Rolling)
+const shake = keyframes`
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+`;
+
+// 🏆 Winner Glow Effect (For Winning Player)
+const winnerGlow = keyframes`
+  0% { box-shadow: 0 0 10px gold; }
+  50% { box-shadow: 0 0 30px gold; }
+  100% { box-shadow: 0 0 10px gold; }
+`;
+
+// 🔄 Fade In/Out Transition for Player Turn
+const fadeOut = keyframes`
+  0% { opacity: 1; }
+  100% { opacity: 0.5; }
+`;
+
+const fadeIn = keyframes`
+  0% { opacity: 0.5; }
+  100% { opacity: 1; }
+`;
+
+// 📥 Button Click Bounce
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+`;
 
 const Main = styled.main`
   display: flex;
@@ -30,6 +63,11 @@ const PlayerSection = styled.section`
   align-items: center;
   transition: all 0.5s ease-in-out;
   background: ${(props) => (props.active ? "rgba(255, 255, 255, 0.2)" : "none")};
+  animation: ${(props) => (props.active ? fadeIn : fadeOut)} 0.5s ease-in-out;
+  ${(props) => props.winner && `
+    animation: ${winnerGlow} 1.5s infinite alternate;
+    background: gold !important;
+  `}
 `;
 
 const PlayerName = styled.h2`
@@ -82,6 +120,7 @@ const Dice = styled.img`
   height: 10rem;
   width: auto;
   box-shadow: 0 2rem 5rem rgba(0, 0, 0, 0.2);
+  animation: ${(props) => (props.shaking ? shake : "none")} 0.5s ease-in-out;
 `;
 
 const Button = styled.button`
@@ -122,23 +161,29 @@ function App() {
   const [dice1, setDice1] = useState(null);
   const [dice2, setDice2] = useState(null);
   const [playing, setPlaying] = useState(true);
+  const [shaking, setShaking] = useState(false);
 
   const rollDice = () => {
     if (!playing) return;
-    const rolled1 = Math.floor(Math.random() * 6) + 1;
-    const rolled2 = Math.floor(Math.random() * 6) + 1;
-    setDice1(rolled1);
-    setDice2(rolled2);
-    if (rolled1 === 1 && rolled2 === 1) {
-      const newScores = [...scores];
-      newScores[activePlayer] = 0;
-      setScores(newScores);
-      switchPlayer();
-    } else if (rolled1 === 1 || rolled2 === 1) {
-      switchPlayer();
-    } else {
-      setCurrentScore((prev) => prev + rolled1 + rolled2);
-    }
+  
+    setShaking(true);
+    setTimeout(() => {
+      setShaking(false);
+      
+      const rolled1 = Math.floor(Math.random() * 6) + 1;
+      const rolled2 = Math.floor(Math.random() * 6) + 1;
+      setDice1(rolled1);
+      setDice2(rolled2);
+      
+      if (rolled1 === 1 && rolled2 === 1) {
+        setScores([0, 0]);
+        switchPlayer();
+      } else if (rolled1 === 1 || rolled2 === 1) {
+        switchPlayer();
+      } else {
+        setCurrentScore((prev) => prev + rolled1 + rolled2);
+      }
+    }, 500);
   };
 
   const switchPlayer = () => {
@@ -171,29 +216,30 @@ function App() {
     <Main>
       <GameContainer>
         {/* Player 1 */}
-        <PlayerSection active={activePlayer === 0}>
-          <PlayerName active={activePlayer === 0}>Player 1</PlayerName>
-          <PlayerScore active={activePlayer === 0}>{scores[0]}</PlayerScore>
-          <CurrentBox>
-            <CurrentLabel>Current</CurrentLabel>
-            <CurrentScore>{activePlayer === 0 ? currentScore : 0}</CurrentScore>
-          </CurrentBox>
-        </PlayerSection>
+        <PlayerSection active={activePlayer === 0} winner={scores[0] >= 100}>
+  <PlayerName active={activePlayer === 0}>Player 1</PlayerName>
+  <PlayerScore active={activePlayer === 0}>{scores[0]}</PlayerScore>
+  <CurrentBox>
+    <CurrentLabel>Current</CurrentLabel>
+    <CurrentScore>{activePlayer === 0 ? currentScore : 0}</CurrentScore>
+  </CurrentBox>
+</PlayerSection>
 
-        {/* Player 2 */}
-        <PlayerSection active={activePlayer === 1}>
-          <PlayerName active={activePlayer === 1}>Player 2</PlayerName>
-          <PlayerScore active={activePlayer === 1}>{scores[1]}</PlayerScore>
-          <CurrentBox>
-            <CurrentLabel>Current</CurrentLabel>
-            <CurrentScore>{activePlayer === 1 ? currentScore : 0}</CurrentScore>
-          </CurrentBox>
-        </PlayerSection>
+{/* Player 2 */}
+<PlayerSection active={activePlayer === 1} winner={scores[1] >= 100}>
+  <PlayerName active={activePlayer === 1}>Player 2</PlayerName>
+  <PlayerScore active={activePlayer === 1}>{scores[1]}</PlayerScore>
+  <CurrentBox>
+    <CurrentLabel>Current</CurrentLabel>
+    <CurrentScore>{activePlayer === 1 ? currentScore : 0}</CurrentScore>
+  </CurrentBox>
+</PlayerSection>
+
 
         {/* Dice Images */}
         <DiceContainer>
-          {dice1 && <Dice src={`/dice-${dice1}.png`} alt="Dice 1" />}
-          {dice2 && <Dice src={`/dice-${dice2}.png`} alt="Dice 2" />}
+        <Dice src={`/dice-${dice1}.png`} alt="Dice 1" shaking={shaking} />
+        <Dice src={`/dice-${dice2}.png`} alt="Dice 2" shaking={shaking} />
         </DiceContainer>
 
         {/* Buttons */}
