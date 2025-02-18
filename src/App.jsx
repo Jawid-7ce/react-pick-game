@@ -1,6 +1,43 @@
 import { useState } from "react";
 import styled from "styled-components";
 
+
+import styled, { keyframes } from "styled-components";
+
+// 🔹 Dice Shake Animation (For Rolling Effect)
+const shake = keyframes`
+  0% { transform: rotate(0deg); }
+  25% { transform: rotate(10deg); }
+  50% { transform: rotate(-10deg); }
+  75% { transform: rotate(5deg); }
+  100% { transform: rotate(0deg); }
+`;
+
+// 🔹 Winner Glow Effect (For the Winning Player)
+const winnerGlow = keyframes`
+  0% { box-shadow: 0 0 10px gold; }
+  50% { box-shadow: 0 0 30px gold; }
+  100% { box-shadow: 0 0 10px gold; }
+`;
+
+// 🔹 Button Bounce Animation (When Clicking a Button)
+const bounce = keyframes`
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+`;
+
+// 🔹 Fade In/Out Player Transition (When Switching Players)
+const fadeOut = keyframes`
+  0% { opacity: 1; }
+  100% { opacity: 0.3; }
+`;
+
+const fadeIn = keyframes`
+  0% { opacity: 0.3; }
+  100% { opacity: 1; }
+`;
+
+
 const Main = styled.main`
   display: flex;
   justify-content: center;
