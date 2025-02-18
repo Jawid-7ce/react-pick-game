@@ -1,8 +1,30 @@
-# React + Vite
+# 🎲 Pick Game – A Two-Player Dice Game
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![Game Screenshot](./public/pick-game.png) 
 
-Currently, two official plugins are available:
+## 🚀 Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Pick Game is a **two-player dice game** where players take turns rolling **two dice** to reach **100 points first**! 🎲 
+
+**But watch out!** If you roll a **1 on either dice**, you lose your turn. If you roll **double 1s**, you lose all points!
+
+Built with **React & Styled Components**, the game features:
+✅ **Beautiful UI** with a **modern gradient background**  
+✅ **Exciting interactions** (button effects, winning highlights)  
+
+---
+
+## 🛠 Tech Stack
+
+- **React.js** ⚛️ (For dynamic UI)
+- **Styled Components** 💅 (For scoped, dynamic styling)
+- **JavaScript ES6+** 🚀 (For game logic)
+
+---
+
+## 🚀 Installation & Setup
+
+1️⃣ **Clone the repository**  
+```sh
+git clone https://github.com/Jawid-7ce/react-pick-game
+cd pick-game
